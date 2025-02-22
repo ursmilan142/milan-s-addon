@@ -15,7 +15,7 @@ def respond_with(data):
 @app.route('/manifest.json')
 def manifest():
     return respond_with({
-        "id": "com.example.fmovies-addon",
+        "id": "com.milan-s-addon",
         "version": "1.0.0",
         "name": "🤫Milan's Free Movies and Series🤫",
         "description": "Stream movies and series for 💯FREE💯",
