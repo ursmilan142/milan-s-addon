@@ -22,7 +22,7 @@ def manifest():
         "resources": ["stream", "meta"],
         "types": ["movie", "series"],
         "idPrefixes": ["fm_"],
-        "logo": f"https://{request.host}/logo.jpg"
+        "logo": f"https://{request.host}/static/logo.jpg"
     })
 
 @app.route('/stream/<type>/<id>.json')
