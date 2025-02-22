@@ -1,18 +1,25 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, Response
 import requests
 from bs4 import BeautifulSoup
 from scraper import get_streams
 
 app = Flask(__name__)
 
+def respond_with(data):
+    """Helper to add CORS headers to responses."""
+    resp = jsonify(data)
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    resp.headers['Access-Control-Allow-Headers'] = '*'
+    return resp
+
 @app.route('/manifest.json')
 def manifest():
-    return jsonify({
-        "id": "com.example.milans-addon",
+    return respond_with({
+        "id": "com.example.fmovies-addon",
         "version": "1.0.0",
-        "name": "Milan's addon",
-        "description": "Stream movies and series for FREE",
-        "resources": ["stream", "meta"],  # Removed "catalog"
+        "name": "FMovies Addon",
+        "description": "Stream movies and series from FMovies24.one",
+        "resources": ["stream", "meta"],
         "types": ["movie", "series"],
         "idPrefixes": ["fm_"]
     })
@@ -20,41 +27,39 @@ def manifest():
 @app.route('/stream/<type>/<id>.json')
 def stream(type, id):
     if type not in ["movie", "series"] or not id.startswith('fm_'):
-        return jsonify({"streams": []}), 400
+        return respond_with({"streams": []}), 400
     
     streams = get_streams(id)
     if not streams:
-        return jsonify({"streams": []}), 404
+        return respond_with({"streams": []}), 404
     
-    # Format streams with unescaped URLs
     formatted_streams = [
         {
             "name": stream['title'],
             "description": stream.get('description', ''),
-            "url": stream['url'].replace('\\/', '/'),  # Fix escaped slashes
+            "url": stream['url'].replace('\\/', '/'),
             "behaviorHints": {"notWebReady": True}
         }
         for stream in streams
     ]
-    return jsonify({"streams": formatted_streams})
+    return respond_with({"streams": formatted_streams})
 
 @app.route('/meta/<type>/<id>.json')
 def meta(type, id):
     if type not in ["movie", "series"] or not id.startswith('fm_'):
-        return jsonify({"meta": {}}), 400
+        return respond_with({"meta": {}}), 400
     
     content_id = id.replace('fm_', '').strip('/')
-    url = f"https://fmovies24.one/film/{content_id}"
+    url = f"https://fmovies24.one/{content_id}"  # Adjusted URL based on your HTML
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
     
     try:
-        print(f"Fetching meta for URL: {url}")  # Debug
+        print(f"Fetching meta for URL: {url}")
         response = requests.get(url, headers=headers, timeout=10)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, 'lxml')
-        print(f"Page content length: {len(response.text)}")  # Debug
+        print(f"Page content length: {len(response.text)}")
         
-        # Extract metadata with fallback selectors
         title_elem = soup.select_one('meta[property="og:title"]') or soup.select_one('h1.entry-title')
         title = title_elem['content'] if title_elem and 'content' in title_elem.attrs else (title_elem.text if title_elem else 'Unknown')
         
@@ -83,11 +88,11 @@ def meta(type, id):
             "director": director,
             "cast": cast
         }
-        print(f"Meta data: {meta_data}")  # Debug
-        return jsonify({"meta": meta_data})
+        print(f"Meta data: {meta_data}")
+        return respond_with({"meta": meta_data})
     except Exception as e:
         print(f"Meta scrape error: {e}")
-        return jsonify({"meta": {}}), 200
+        return respond_with({"meta": {}}), 200
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000, debug=True)
