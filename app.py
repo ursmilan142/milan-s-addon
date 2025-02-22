@@ -15,10 +15,10 @@ def respond_with(data):
 @app.route('/manifest.json')
 def manifest():
     return respond_with({
-        "id": "com.example.fmovies-addon",
+        "id": "com.milan-s-addon",
         "version": "1.0.0",
-        "name": "FMovies Addon",
-        "description": "Stream movies and series from FMovies24.one",
+        "name": "🤫Milan's Free Movies and Series🤫",
+        "description": "Stream movies and series for 💯FREE💯",
         "resources": ["stream", "meta"],
         "types": ["movie", "series"],
         "idPrefixes": ["fm_", "tt"],  # Add "tt" to support IMDb IDs
@@ -30,16 +30,12 @@ def stream(type, id):
     if type not in ["movie", "series"]:
         return respond_with({"streams": []}), 400
     
-    # Handle both fm_ and tt IDs
+    # Handle both fm_ and direct movie names
     if id.startswith('fm_'):
         streams = get_streams(id)
-    elif id.startswith('tt'):
-        # Map tt ID to FMovies URL (assuming IMDb ID matches FMovies slug or TMDb ID)
-        # Example: tt14513804 -> captain-america-brave-new-world or tmdb 822119
-        # This is a placeholder; you'll need to adjust based on FMovies URL pattern
-        streams = get_streams(f"fm_{id}")  # Temporary mapping
     else:
-        streams = []
+        # Assume it's a direct movie name and prepend fm_
+        streams = get_streams(f"fm_{id}")
     
     if not streams:
         return respond_with({"streams": []}), 404
@@ -60,8 +56,8 @@ def meta(type, id):
     if type not in ["movie", "series"]:
         return respond_with({"meta": {}}), 400
     
+    # Handle both fm_ and direct movie names
     content_id = id.replace('fm_', '').strip('/') if id.startswith('fm_') else id
-    # For tt IDs, assume it's an IMDb ID and map to FMovies slug
     url = f"https://fmovies24.one/{content_id}"  # Adjust if tt IDs need different handling
     
     try:
@@ -109,4 +105,4 @@ def serve_logo():
         return "Logo not found", 404
         
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8000, debug=True)
+    app.run(host='0.0.0.0', port=8001, debug=True)
