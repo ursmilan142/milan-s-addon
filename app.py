@@ -17,8 +17,8 @@ def manifest():
     return respond_with({
         "id": "com.example.fmovies-addon",
         "version": "1.0.0",
-        "name": "FMovies Addon",
-        "description": "Stream movies and series from FMovies24.one",
+        "name": "🤫Milan's Free Movies and Series🤫",
+        "description": "Stream movies and series for 💯FREE💯",
         "resources": ["stream", "meta"],
         "types": ["movie", "series"],
         "idPrefixes": ["fm_"]
