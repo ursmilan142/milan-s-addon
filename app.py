@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, Response
+from flask import Flask, jsonify, request, Response, send_file
 import requests
 from bs4 import BeautifulSoup
 from scraper import get_streams
@@ -11,6 +11,14 @@ def respond_with(data):
     resp.headers['Access-Control-Allow-Origin'] = '*'
     resp.headers['Access-Control-Allow-Headers'] = '*'
     return resp
+
+@app.route('/logo.jpg')
+def serve_logo():
+    try:
+        return send_file('logo.jpg', mimetype='image/jpeg')
+    except FileNotFoundError:
+        logger.error("logo.jpg not found in root directory")
+        return "Logo not found", 404
 
 @app.route('/manifest.json')
 def manifest():
