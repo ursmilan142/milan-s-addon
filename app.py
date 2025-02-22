@@ -27,59 +27,62 @@ def manifest():
 
 @app.route('/stream/<type>/<id>.json')
 def stream(type, id):
+    print(f"Request received: type={type}, id={id}")
     if type not in ["movie", "series"]:
         return respond_with({"streams": []}), 400
-    
+
     # Handle IMDb IDs (starting with 'tt')
     if id.startswith('tt'):
-        # Generate multiple streaming URLs for IMDb IDs
+        print("Handling IMDb ID")
         streams = [
             {
                 "name": "VidSrc (To)",
-                "description": "Stream IMDb 1",
+                "description": "Stream via VidSrc (To) using IMDb ID",
                 "url": f"https://vidsrc.to/embed/movie/{id}",
                 "behaviorHints": {"notWebReady": True}
             },
             {
                 "name": "VidLink",
-                "description": "Stream IMDb 2",
-                "url": f"https://vidlink.pro/movie/{id}?",
+                "description": "Stream via VidLink using IMDb ID",
+                "url": f"https://vidlink.pro/movie/{id}?primaryColor=9fd829&secondaryColor=9fd829&iconColor=9fd829",
                 "behaviorHints": {"notWebReady": True}
             }
         ]
         return respond_with({"streams": streams})
-    
+
     # Handle TMDb IDs (numeric)
     elif id.isdigit():
-        # Generate multiple streaming URLs for TMDb IDs
+        print("Handling TMDb ID")
         streams = [
             {
                 "name": "VidSrc (Pro)",
-                "description": "Stream TMDb 1",
+                "description": "Stream via VidSrc (Pro) using TMDb ID",
                 "url": f"https://vidsrc.pro/embed/movie/{id}",
                 "behaviorHints": {"notWebReady": True}
             },
             {
                 "name": "VidSrc (XYZ)",
-                "description": "Stream TMDb 2",
+                "description": "Stream via VidSrc (XYZ) using TMDb ID",
                 "url": f"https://vidsrc.xyz/embed/movie/{id}",
                 "behaviorHints": {"notWebReady": True}
             },
             {
                 "name": "VidLink",
-                "description": "Stream TMDb 3",
-                "url": f"https://vidlink.pro/movie/{id}?",
+                "description": "Stream via VidLink using TMDb ID",
+                "url": f"https://vidlink.pro/movie/{id}?primaryColor=9fd829&secondaryColor=9fd829&iconColor=9fd829",
                 "behaviorHints": {"notWebReady": True}
             }
         ]
         return respond_with({"streams": streams})
-    
-    # Handle FMovies IDs (starting with 'fm_')
+
+    # Handle FMovies-style IDs (starting with 'fm_')
     elif id.startswith('fm_'):
+        print("Handling FMovies-style ID")
         streams = get_streams(id)
         if not streams:
+            print("No streams found for FMovies-style ID")
             return respond_with({"streams": []}), 404
-        
+
         formatted_streams = [
             {
                 "name": stream['title'],
@@ -90,13 +93,15 @@ def stream(type, id):
             for stream in streams
         ]
         return respond_with({"streams": formatted_streams})
-    
+
     # Handle direct movie names (fallback to FMovies)
     else:
+        print("Handling direct movie name")
         streams = get_streams(f"fm_{id}")
         if not streams:
+            print("No streams found for direct movie name")
             return respond_with({"streams": []}), 404
-        
+
         formatted_streams = [
             {
                 "name": stream['title'],
