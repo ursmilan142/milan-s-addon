@@ -21,7 +21,7 @@ def manifest():
         "description": "Stream movies and series for 💯FREE💯",
         "resources": ["stream", "meta"],
         "types": ["movie", "series"],
-        "idPrefixes": ["fm_"]
+        "idPrefixes": ["fm_"],
         "logo": f"https://{request.host}/logo.jpg"
     })
 
