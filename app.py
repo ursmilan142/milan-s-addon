@@ -19,7 +19,7 @@ def manifest():
         "resources": ["stream"],
         "types": ["movie", "series"],
         "idPrefixes": ["tt"],  # Support IMDb IDs
-        "logo": "https://example.com/logo.jpg"
+        "logo": "https://github.com/ursmilan142/milan-s-addon/blob/f33720bbaf4e1d4cb07cdb3c9119abc08038c91f/logo.jpg"
     })
 
 @app.route('/stream/<type>/<id>.json')
